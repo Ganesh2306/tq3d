@@ -263,7 +263,6 @@ pipeline {
                         sed -i 's|/q3d/v1/Tds.min.js?[^"]*|/q3d/v1/Tds.min.js?${query}|g' src/js/login.js
                         echo "[OK] login.js → v1/Tds.min.js?${query}"
                         echo "=== Active Plugin Lines ==="
-                        // grep 'Tds.min.js' src/js/login.js | grep -v '//'
                         grep 'Tds.min.js' src/js/login.js | grep -v '//' || true
                         echo "=========================="
                     """
