@@ -252,9 +252,9 @@ pipeline {
                     def version = sh(
                         script: "curl -s https://plugin.dam3d.in/q3d/v4/Tds.min.js | grep -o 'v[0-9]*\\.[0-9]*' | head -1",
                         returnStdout: true
-                        ).trim()
+                    ).trim()
 
-                        def query = "${version}_${date}"
+                    def query = "${version}_${date}"
 
                     echo "========================================="
                     echo " Plugin Query  : ${query}"
