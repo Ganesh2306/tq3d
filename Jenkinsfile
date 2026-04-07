@@ -201,7 +201,7 @@ pipeline {
     agent any
 
     environment {
-        APP_SERVER = 'ubuntu@43.204.228.159'
+        APP_SERVER = 'ubuntu@3.110.224.119'
         APP_DIR    = '/var/www/html/q3d'
         GITHUB_REPO = 'https://github.com/Ganesh2306/tq3d.git'
         VERSION    = "1.0.${BUILD_NUMBER}"
