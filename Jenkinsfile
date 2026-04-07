@@ -247,7 +247,7 @@ pipeline {
             steps {
                 script {
                     def date = sh(
-                        script: "curl -sI https://plugin.dam3d.in/q3d/v1/Tds.min.js | grep -i 'last-modified' | awk '{print \$3\$4\$5}' | tr -d ' ,'",
+                        script: "curl -sI https://plugin.dam3d.in/q3d/v4/Tds.min.js | grep -i 'last-modified' | awk '{print \$3\$4\$5}' | tr -d ' ,'",
                         returnStdout: true
                     ).trim()
 
@@ -260,8 +260,8 @@ pipeline {
                     echo "========================================="
 
                     sh """
-                        sed -i 's|/q3d/v1/Tds.min.js?[^"]*|/q3d/v1/Tds.min.js?${query}|g' src/js/login.js
-                        echo "[OK] login.js → v1/Tds.min.js?${query}"
+                        sed -i 's|/q3d/v4/Tds.min.js?[^"]*|/q3d/v4/Tds.min.js?${query}|g' src/js/login.js
+                        echo "[OK] login.js → v4/Tds.min.js?${query}"
                         echo "=== Active Plugin Lines ==="
                         grep 'Tds.min.js' src/js/login.js | grep -v '//' || true
                         echo "=========================="
