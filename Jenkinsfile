@@ -201,10 +201,11 @@ pipeline {
     agent any
 
     environment {
-        APP_SERVER = 'ubuntu@3.110.224.119'
-        APP_DIR    = '/var/www/html/q3d'
+        APP_SERVER  = 'ubuntu@43.204.228.159'
+        APP_DIR     = '/var/www/html/q3d'
         GITHUB_REPO = 'https://github.com/Ganesh2306/tq3d.git'
-        VERSION    = "1.0.${BUILD_NUMBER}"
+        VERSION     = "1.0.${BUILD_NUMBER}"
+        PLUGIN_VER  = "v6.2"   // ← फक्त हे बदल जेव्हा plugin version बदलेल
     }
 
     stages {
@@ -236,34 +237,34 @@ pipeline {
         }
 
         // ─────────────────────────────────────────
-        // STAGE 2 : Plugin Version Auto Update ← नवीन
+        // STAGE 2 : Plugin Version Auto Update
         //   Plugin Server वरून Tds.min.js चा
         //   Last-Modified Date fetch करतो
+        //   Query = v6.2_12Feb2026 format बनतो
         //   login.js मधला Query आपोआप update होतो
         // ─────────────────────────────────────────
         stage('Update Plugin Version') {
             steps {
                 script {
-                    def query = sh(
-                        script: "curl -sI https://plugin.dam3d.in/q3d/v4/Tds.min.js | grep -i 'last-modified' | awk '{print \$3\$4\$5}' | tr -d ' ,'",
+                    def date = sh(
+                        script: "curl -sI https://plugin.dam3d.in/q3d/v1/Tds.min.js | grep -i 'last-modified' | awk '{print \$3\$4\$5}' | tr -d ' ,'",
                         returnStdout: true
                     ).trim()
 
-                    def version = sh(
-                        script: "curl -s https://plugin.dam3d.in/q3d/v4/Tds.min.js | grep -o 'v[0-9]*\\.[0-9]*' | head -1",
-                        returnStdout: true
-                    ).trim()
-
-                    def query = "${version}_${date}"
+                    def query = "${PLUGIN_VER}_${date}"
 
                     echo "========================================="
-                    echo " Plugin Query  : ${query}"
+                    echo " Plugin Version : ${PLUGIN_VER}"
+                    echo " Plugin Date    : ${date}"
+                    echo " Plugin Query   : ${query}"
                     echo "========================================="
 
                     sh """
-                        sed -i 's|/q3d/v4/Tds.min.js?v[0-9.]*|/q3d/v4/Tds.min.js?${query}|g' src/js/login.js
-                        echo "[OK] login.js → v4/Tds.min.js?${query}"
+                        sed -i 's|/q3d/v1/Tds.min.js?[^"]*|/q3d/v1/Tds.min.js?${query}|g' src/js/login.js
+                        echo "[OK] login.js → v1/Tds.min.js?${query}"
+                        echo "=== Active Plugin Lines ==="
                         grep 'Tds.min.js' src/js/login.js | grep -v '//'
+                        echo "=========================="
                     """
                 }
             }
@@ -285,6 +286,7 @@ pipeline {
 
         // ─────────────────────────────────────────
         // STAGE 4 : npm install + build
+        //   dist/ folder मध्ये output येईल
         // ─────────────────────────────────────────
         stage('Build') {
             steps {
@@ -322,10 +324,13 @@ pipeline {
                     sh """
                         git config user.email "jenkins@q3d.ci"
                         git config user.name  "Jenkins CI"
+
                         git tag -a "${env.FULL_VERSION}" \
                                 -m "Release ${env.FULL_VERSION} | Build #${BUILD_NUMBER}"
+
                         git push https://\${GIT_USER}:\${GIT_TOKEN}@github.com/Ganesh2306/tq3d.git \
                                  "${env.FULL_VERSION}"
+
                         echo "[OK] Tag ${env.FULL_VERSION} pushed to GitHub"
                     """
                 }
@@ -338,29 +343,37 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 sshagent(credentials: ['app-server-ssh-key']) {
+
                     sh """
                         scp -o StrictHostKeyChecking=no \
                             ${env.VERSIONED_ZIP} \
                             ${APP_SERVER}:/tmp/${env.VERSIONED_ZIP}
                         echo "[OK] ${env.VERSIONED_ZIP} copied to /tmp/"
                     """
+
                     sh """
                         ssh -o StrictHostKeyChecking=no ${APP_SERVER} '
                             set -e
+
                             sudo mkdir -p ${APP_DIR}
                             sudo mkdir -p ${APP_DIR}/backups
+
                             BACKUP_DIR="${APP_DIR}/backups/${env.FULL_VERSION}"
                             sudo mkdir -p "\$BACKUP_DIR"
                             sudo find ${APP_DIR} -maxdepth 1 \
                                    -not -name "backups" \
                                    -not -name "CURRENT_VERSION" \
                                    -not -name "." \
+                                   -not -path "${APP_DIR}" \
                                    -exec cp -r {} "\$BACKUP_DIR/" \\;
                             echo "[OK] Backup: \$BACKUP_DIR"
+
                             sudo unzip -o /tmp/${env.VERSIONED_ZIP} -d ${APP_DIR}
                             sudo rm -f /tmp/${env.VERSIONED_ZIP}
+
                             sudo chown -R www-data:www-data ${APP_DIR}
                             sudo chmod -R 755 ${APP_DIR}
+
                             echo "${env.FULL_VERSION}" | sudo tee ${APP_DIR}/CURRENT_VERSION
                             echo "[OK] Deployed ${env.FULL_VERSION} to ${APP_DIR}"
                         '
@@ -379,8 +392,10 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${APP_SERVER} '
                             echo "=== Deployed Version ==="
                             cat ${APP_DIR}/CURRENT_VERSION
+
                             echo "=== Files in Deploy Dir ==="
                             ls -lh ${APP_DIR} | head -10
+
                             echo "=== Nginx Status ==="
                             systemctl is-active --quiet nginx && \
                             echo "[OK] Nginx is RUNNING" || \
@@ -394,7 +409,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ Deploy SUCCESS — Version: ${env.FULL_VERSION} — Files live at ${APP_DIR}"
+            echo "✅ Deploy SUCCESS — Version: ${env.FULL_VERSION} — Plugin: ${PLUGIN_VER} — Live at ${APP_DIR}"
         }
         failure {
             echo "❌ Deploy FAILED — Check console output above"
