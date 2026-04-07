@@ -245,18 +245,25 @@ pipeline {
             steps {
                 script {
                     def query = sh(
-                        script: "curl -sI https://plugin.dam3d.in/q3d/v1/Tds.min.js | grep -i 'last-modified' | awk '{print \$3\$4\$5}' | tr -d ' ,'",
+                        script: "curl -sI https://plugin.dam3d.in/q3d/v4/Tds.min.js | grep -i 'last-modified' | awk '{print \$3\$4\$5}' | tr -d ' ,'",
                         returnStdout: true
                     ).trim()
+
+                    def version = sh(
+                        script: "curl -s https://plugin.dam3d.in/q3d/v4/Tds.min.js | grep -o 'v[0-9]*\\.[0-9]*' | head -1",
+                        returnStdout: true
+                        ).trim()
+
+                        def query = "${version}_${date}"
 
                     echo "========================================="
                     echo " Plugin Query  : ${query}"
                     echo "========================================="
 
                     sh """
-                        sed -i 's|/q3d/v1/Tds.min.js?v[0-9.]*|/q3d/v1/Tds.min.js?${query}|g' src/js/login.js
-                        echo "[OK] login.js → v1/Tds.min.js?${query}"
-                        grep 'Tds.min.js' src/js/login.js
+                        sed -i 's|/q3d/v4/Tds.min.js?v[0-9.]*|/q3d/v4/Tds.min.js?${query}|g' src/js/login.js
+                        echo "[OK] login.js → v4/Tds.min.js?${query}"
+                        grep 'Tds.min.js' src/js/login.js | grep -v '//'
                     """
                 }
             }
