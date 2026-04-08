@@ -7,7 +7,7 @@ pipeline {
         PLUGIN_DIR   = '/var/www/html/textronics/plugin/q3d/v4'   // Plugin deploy path
         GITHUB_REPO  = 'https://github.com/Ganesh2306/tq3d.git'
         VERSION      = "1.0.${BUILD_NUMBER}"
-        TDS_SRC_FILE = 'src/js/Tdsunmini.js'                      // Watch फक्त याला
+        TDS_SRC_FILE = 'src/Tdsunmini.js'                         // Watch फक्त याला
     }
 
     stages {
@@ -31,18 +31,13 @@ pipeline {
 
                     // ─────────────────────────────────────────
                     // Tdsunmini.js बदलला का? → Git diff check
-                    // First commit असेल तर सगळ्या files changed मानतो
                     // ─────────────────────────────────────────
                     def changedFiles = sh(
-                        script: '''
-                            git rev-parse HEAD~1 > /dev/null 2>&1 \
-                            && git diff --name-only HEAD~1 HEAD \
-                            || git diff-tree --no-commit-id -r --name-only HEAD
-                        ''',
+                        script: 'git diff --name-only HEAD~1 HEAD || echo ""',
                         returnStdout: true
                     ).trim()
 
-                    env.TDS_CHANGED = changedFiles.contains('src/js/Tdsunmini.js') ? 'true' : 'false'
+                    env.TDS_CHANGED = changedFiles.contains('src/Tdsunmini.js') ? 'true' : 'false'
 
                     echo "========================================="
                     echo " Build Version   : ${env.FULL_VERSION}"
@@ -71,9 +66,9 @@ pipeline {
 
         // ─────────────────────────────────────────
         // STAGE 3 : Tdsunmini.js Minify + Plugin Deploy
-        //   फक्त src/js/Tdsunmini.js बदलला असेल तरच
-        //   → terser ने minify करेल → Tds.min.js
-        //   → Plugin server: /var/www/html/textronics/plugin/q3d/v4/
+        //   फक्त src/Tdsunmini.js बदलला असेल तरच
+        //   → terser ने minify करेल
+        //   → Plugin server वर copy करेल
         //   → CSS / इतर files बदलल्या → SKIP
         // ─────────────────────────────────────────
         stage('Minify & Deploy Plugin (Tdsunmini.js)') {
@@ -82,44 +77,31 @@ pipeline {
             }
             steps {
                 sh '''
-                    echo "=== src/js/Tdsunmini.js बदलला → Minify सुरू ==="
+                    echo "=== Tdsunmini.js बदलला → Minify सुरू ==="
+                    npm install
 
-                    # terser नसेल तर install करा
-                    npx terser --version 2>/dev/null || npm install -g terser
+                    # terser install नसेल तर install करा
+                    npx terser --version || npm install -g terser
 
-                    # Output folder असेल याची खात्री
-                    mkdir -p dist
-
-                    # Minify: src/js/Tdsunmini.js → dist/Tds.min.js
-                    npx terser src/js/Tdsunmini.js \
+                    # Minify करा → Tds.min.js बनव
+                    npx terser src/Tdsunmini.js \
                         --compress \
                         --mangle \
                         --output dist/Tds.min.js
 
                     echo "[OK] Minified → dist/Tds.min.js"
-                    echo "=== Original Size ===" && du -sh src/js/Tdsunmini.js
-                    echo "=== Minified Size ===" && du -sh dist/Tds.min.js
+                    echo "=== File Size ==="
+                    du -sh dist/Tds.min.js
                 '''
 
-                // Plugin Server वर deploy करा + permissions fix
+                // Plugin Server वर deploy करा
                 sshagent(credentials: ['app-server-ssh-key']) {
                     sh """
-                        # Plugin directory असेल याची खात्री
-                        ssh -o StrictHostKeyChecking=no ${APP_SERVER} \
-                            'sudo mkdir -p ${PLUGIN_DIR} && sudo chown ubuntu:ubuntu ${PLUGIN_DIR}'
-
-                        # Tds.min.js → Plugin Server
                         scp -o StrictHostKeyChecking=no \
                             dist/Tds.min.js \
                             ${APP_SERVER}:${PLUGIN_DIR}/Tds.min.js
 
-                        # Permissions fix
-                        ssh -o StrictHostKeyChecking=no ${APP_SERVER} '
-                            sudo chown www-data:www-data ${PLUGIN_DIR}/Tds.min.js
-                            sudo chmod 644 ${PLUGIN_DIR}/Tds.min.js
-                            echo "[OK] Tds.min.js deployed → ${PLUGIN_DIR}/Tds.min.js"
-                            ls -lh ${PLUGIN_DIR}/Tds.min.js
-                        '
+                        echo "[OK] Tds.min.js → ${PLUGIN_DIR}/Tds.min.js deployed!"
                     """
                 }
             }
@@ -135,7 +117,7 @@ pipeline {
                 expression { env.TDS_CHANGED == 'false' }
             }
             steps {
-                echo "⏭️  src/js/Tdsunmini.js बदललेला नाही → Minify & Plugin deploy SKIP"
+                echo "⏭️  src/Tdsunmini.js बदललेला नाही → Minify & Plugin deploy SKIP"
                 echo "✅ Plugin server वरची जुनी Tds.min.js तशीच राहील"
             }
         }
