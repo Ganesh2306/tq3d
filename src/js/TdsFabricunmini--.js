@@ -1,4 +1,3 @@
-// v1 - initial plugin deploy | TdsFabric.min.js
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
