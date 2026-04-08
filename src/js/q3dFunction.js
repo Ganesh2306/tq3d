@@ -1,7 +1,7 @@
 
 import { saveAs } from 'file-saver';
 let q3d_PluginObj = "";
-import "https://tplugin.dam3d.in/fabric/v1/Fabric.min.js?v1.1"
+import "https://tplugin.dam3d.in/fabric/v1/TdsFabric.min.js?v1.1"
 //import "./TdsFabric.min.js";
 // import './TdsFabric.min.js';
 //import './TdsFabric.min.js';
