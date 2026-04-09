@@ -367,8 +367,8 @@ function loadDataAllForOrg() {
     }).done(function (r) {
       sessionStorage.setItem('data', JSON.stringify(r));
       if (r.products.length > 0) {
-        const TdsScripts = ["https://tplugin.dam3d.in/q3d/v4/Tds.min.js?v1.2"];
-        // const TdsScripts = ["https://plugin.dam3d.in/q3d/v4/Tds.min.js?v6.4"]; 
+        // const TdsScripts = ["https://tplugin.dam3d.in/q3d/v4/Tds.min.js?v1.2"];
+        const TdsScripts = ["https://plugin.dam3d.in/q3d/v4/Tds.min.js?v6.4"]; 
         // const TdsScripts = ["https://plugin.dam3d.in/q3d/v1/Tds.min.js?v5.7"];
         //const TdsScripts = ["https://plugin.dam3d.in/q3d/v2/Tds.min.js?v5.7"]; // For test
         //const TdsScripts = ["./src/js/Tds.min.js?v4,3"];
@@ -391,8 +391,8 @@ function loadDataAllForOrg() {
     });
 
   } else {
-    const TdsScripts = ["https://tplugin.dam3d.in/q3d/v4/Tds.min.js?v1.2"]
-    // const TdsScripts = ["https://plugin.dam3d.in/q3d/v4/Tds.min.js?v6.4"]
+    // const TdsScripts = ["https://tplugin.dam3d.in/q3d/v4/Tds.min.js?v1.2"]
+      const TdsScripts = ["https://plugin.dam3d.in/q3d/v4/Tds.min.js?v6.4"]
     // const TdsScripts = ["https://plugin.dam3d.in/q3d/v1/Tds.min.js?v5.7"];
    // const TdsScripts = ["https://plugin.dam3d.in/q3d/v2/Tds.min.js?v5.7"]; // For test
     //const TdsScripts = ["./src/js/Tds.min.js?v4,3"];
