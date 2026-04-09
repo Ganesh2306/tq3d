@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_SERVER   = 'ubuntu@65.2.69.101'
+        APP_SERVER   = 'ubuntu@13.126.117.137'
         APP_DIR      = '/var/www/html/q3d'
         PLUGIN_DIR   = '/var/www/html/textronics/plugin/q3d/v4'   // Plugin deploy path
         GITHUB_REPO  = 'https://github.com/Ganesh2306/tq3d.git'
