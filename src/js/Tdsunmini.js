@@ -5393,7 +5393,7 @@
           case 'hsl':
           case 'hsla':
             if (color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec(components)) {
-              // hsl(120,50%,50%) hsla(120,50%,50%,0.5)
+              // hsl(120,50%,50%) hsla(120, 66%, 47%, 0.50)
               const h = parseFloat(color[1]) / 360;
               const s = parseInt(color[2], 10) / 100;
               const l = parseInt(color[3], 10) / 100;
