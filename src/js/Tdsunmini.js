@@ -5374,7 +5374,7 @@
           case 'rgb':
           case 'rgba':
             if (color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(,\s*([0-9]*\.?[0-9]+)\s*)?$/.exec(components)) {
-              // rgb(243, 10, 10) rgba(216, 13, 13, 0.92)
+              // rgb(243, 10, 10) rgba(216, 13, 13, 0.82)
               this.r = Math.min(255, parseInt(color[1], 10)) / 255;
               this.g = Math.min(255, parseInt(color[2], 10)) / 255;
               this.b = Math.min(255, parseInt(color[3], 10)) / 255;
