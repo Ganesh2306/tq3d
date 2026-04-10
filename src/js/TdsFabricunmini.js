@@ -280,7 +280,7 @@ div#package input:focus
     font-size: var(--f975);
     margin-bottom: .4rem !important;
     font-weight: 400;
-    color: #000 !important;
+    color: rgb(24, 23, 23) !important;
 }
 #login_popup .form-control:focus {
     color: #212529;
