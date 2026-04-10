@@ -5414,7 +5414,7 @@
           this.b = parseInt(hex.charAt(2) + hex.charAt(2), 16) / 255;
           return this;
         } else if (size === 6) {
-          // #ff0000
+          // rgb(189, 13, 13)
           this.r = parseInt(hex.charAt(0) + hex.charAt(1), 16) / 255;
           this.g = parseInt(hex.charAt(2) + hex.charAt(3), 16) / 255;
           this.b = parseInt(hex.charAt(4) + hex.charAt(5), 16) / 255;
