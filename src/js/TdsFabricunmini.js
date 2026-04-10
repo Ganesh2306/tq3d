@@ -245,7 +245,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `:root{
 	--f875:.875rem;	
 	--f775:.775rem;
 	--f675:.675rem;
-	--f975: 0.975rem;
+	--f975: 0.985rem;
 	--header:#fff;
 	--text-black:#000;
 }	
