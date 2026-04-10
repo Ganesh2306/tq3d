@@ -496,7 +496,7 @@ button#signuphere:hover{
 @media only screen and (min-device-width: 1080px) and (max-device-width: 1920px) and (orientation: portrait) {
   .login-page-container {
     height: 100vh;
-    /* background-image: url(https://s3.ap-south-1.amazonaws.com/aws.tds/dam/q3d/assets/Configuration/textronics/bannerImages/totem-bg.jpg); */
+    /* background-image: url(https://s3.ap-south-1.amazonaws.com/aws.tds/dam/q3d/assets/Configuration/textronics/bannerImages/totem-bg.jpg---); */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center 0px;
