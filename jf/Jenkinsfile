@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_SERVER   = 'ubuntu@3.110.177.55'
+        APP_SERVER   = 'ubuntu@13.203.159.244'
         APP_DIR      = '/var/www/html/q3d'
         PLUGIN_Q3D_DIR = '/var/www/html/textronics/plugin/q3d/v4'   // Tds.min.js deploy path
         GITHUB_REPO    = 'https://github.com/Ganesh2306/tq3d.git'
@@ -72,6 +72,8 @@ pipeline {
         // STAGE 3 : Tdsunmini.js Minify + Plugin Deploy
         //   फक्त src/js/Tdsunmini.js बदलला असेल तरच
         //   → terser ने minify करेल → Tds.min.js
+        //   → जुनी Tds.min.js backup → delete → नवीन deploy
+        //   → login.js मध्ये ?v=BUILD_NUMBER auto update
         //   → /var/www/html/textronics/plugin/q3d/v4/
         // ─────────────────────────────────────────
         stage('Minify & Deploy Plugin (Tdsunmini.js)') {
@@ -93,19 +95,54 @@ pipeline {
                     echo "=== Original ===" && du -sh src/js/Tdsunmini.js
                     echo "=== Minified ===" && du -sh dist/Tds.min.js
                 '''
+
+                // login.js मध्ये ?v= version auto update
+                script {
+                    sh """
+                        echo "=== login.js मध्ये version update ==="
+
+                        # ?v1.4 → ?v${BUILD_NUMBER} असं replace करा (दोन्ही active lines)
+                        sed -i 's|Tds\\.min\\.js?v[^"]*|Tds.min.js?v${BUILD_NUMBER}|g' src/js/login.js
+
+                        echo "[OK] login.js updated → Tds.min.js?v${BUILD_NUMBER}"
+                        echo "=== Active lines ==="
+                        grep 'Tds.min.js' src/js/login.js | grep -v '//' || true
+                    """
+                }
+
                 sshagent(credentials: ['app-server-ssh-key']) {
                     sh """
+                        # Plugin directory + ubuntu ownership
                         ssh -o StrictHostKeyChecking=no ${APP_SERVER} \
                             'sudo mkdir -p ${PLUGIN_Q3D_DIR} && sudo chown ubuntu:ubuntu ${PLUGIN_Q3D_DIR}'
 
+                        # जुनी Tds.min.js backup घे → delete कर
+                        ssh -o StrictHostKeyChecking=no ${APP_SERVER} '
+                            BACKUP_DIR="${PLUGIN_Q3D_DIR}/backups"
+                            sudo mkdir -p "\$BACKUP_DIR"
+                            sudo chown ubuntu:ubuntu "\$BACKUP_DIR"
+
+                            if [ -f "${PLUGIN_Q3D_DIR}/Tds.min.js" ]; then
+                                TIMESTAMP=\$(date +%Y%m%d_%H%M%S)
+                                sudo cp ${PLUGIN_Q3D_DIR}/Tds.min.js "\$BACKUP_DIR/Tds.min.js.\$TIMESTAMP"
+                                sudo rm -f ${PLUGIN_Q3D_DIR}/Tds.min.js
+                                echo "[OK] Backup: \$BACKUP_DIR/Tds.min.js.\$TIMESTAMP"
+                                echo "[OK] जुनी Tds.min.js delete केली"
+                            else
+                                echo "[INFO] जुनी Tds.min.js नाही → fresh deploy"
+                            fi
+                        '
+
+                        # नवीन Tds.min.js deploy कर
                         scp -o StrictHostKeyChecking=no \
                             dist/Tds.min.js \
                             ${APP_SERVER}:${PLUGIN_Q3D_DIR}/Tds.min.js
 
+                        # Permissions fix
                         ssh -o StrictHostKeyChecking=no ${APP_SERVER} '
                             sudo chown www-data:www-data ${PLUGIN_Q3D_DIR}/Tds.min.js
                             sudo chmod 644 ${PLUGIN_Q3D_DIR}/Tds.min.js
-                            echo "[OK] Tds.min.js → ${PLUGIN_Q3D_DIR}/Tds.min.js"
+                            echo "[OK] नवीन Tds.min.js deployed!"
                             ls -lh ${PLUGIN_Q3D_DIR}/Tds.min.js
                         '
                     """

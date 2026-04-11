@@ -73,7 +73,6 @@ pipeline {
         //   फक्त src/js/Tdsunmini.js बदलला असेल तरच
         //   → terser ने minify करेल → Tds.min.js
         //   → जुनी Tds.min.js backup → delete → नवीन deploy
-        //   → login.js मध्ये ?v=BUILD_NUMBER auto update
         //   → /var/www/html/textronics/plugin/q3d/v4/
         // ─────────────────────────────────────────
         stage('Minify & Deploy Plugin (Tdsunmini.js)') {
@@ -95,28 +94,13 @@ pipeline {
                     echo "=== Original ===" && du -sh src/js/Tdsunmini.js
                     echo "=== Minified ===" && du -sh dist/Tds.min.js
                 '''
-
-                // login.js मध्ये ?v= version auto update
-                script {
-                    sh """
-                        echo "=== login.js मध्ये version update ==="
-
-                        # ?v1.4 → ?v${BUILD_NUMBER} असं replace करा (दोन्ही active lines)
-                        sed -i 's|Tds\\.min\\.js?v[^"]*|Tds.min.js?v${BUILD_NUMBER}|g' src/js/login.js
-
-                        echo "[OK] login.js updated → Tds.min.js?v${BUILD_NUMBER}"
-                        echo "=== Active lines ==="
-                        grep 'Tds.min.js' src/js/login.js | grep -v '//' || true
-                    """
-                }
-
                 sshagent(credentials: ['app-server-ssh-key']) {
                     sh """
                         # Plugin directory + ubuntu ownership
                         ssh -o StrictHostKeyChecking=no ${APP_SERVER} \
                             'sudo mkdir -p ${PLUGIN_Q3D_DIR} && sudo chown ubuntu:ubuntu ${PLUGIN_Q3D_DIR}'
 
-                        # जुनी Tds.min.js backup घे → delete कर
+                        # जुनी Tds.min.js backup घे → delete कर → नवीन deploy
                         ssh -o StrictHostKeyChecking=no ${APP_SERVER} '
                             BACKUP_DIR="${PLUGIN_Q3D_DIR}/backups"
                             sudo mkdir -p "\$BACKUP_DIR"
@@ -138,12 +122,17 @@ pipeline {
                             dist/Tds.min.js \
                             ${APP_SERVER}:${PLUGIN_Q3D_DIR}/Tds.min.js
 
-                        # Permissions fix
+                        # Permissions fix + Cache clear
                         ssh -o StrictHostKeyChecking=no ${APP_SERVER} '
                             sudo chown www-data:www-data ${PLUGIN_Q3D_DIR}/Tds.min.js
                             sudo chmod 644 ${PLUGIN_Q3D_DIR}/Tds.min.js
                             echo "[OK] नवीन Tds.min.js deployed!"
                             ls -lh ${PLUGIN_Q3D_DIR}/Tds.min.js
+
+                            # Nginx cache clear
+                            sudo find /var/cache/nginx -type f -delete 2>/dev/null || true
+                            sudo nginx -s reload
+                            echo "[OK] Nginx cache cleared + reloaded!"
                         '
                     """
                 }
