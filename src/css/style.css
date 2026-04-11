@@ -232,13 +232,13 @@ nav .desk_login_btn:hover {
 
 /* model */
 .model {
-  /* background-color: chartreuse; 
-  border: 1px solid firebrick; */
+  background: linear-gradient(160deg, rgba(37, 99, 235, 0.08) 0%, rgba(236, 72, 153, 0.08) 45%, rgba(59, 130, 246, 0.08) 100%);
   height: calc(100vh - 3.1rem);
   text-align: center;
   position: relative;
-  border-left: 1px solid var(--br--light-color);
-  border-right: 1px solid var(--br--light-color);
+  border-left: 1px solid rgba(56, 189, 248, 0.35);
+  border-right: 1px solid rgba(236, 72, 153, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), inset 0 0 20px rgba(56, 189, 248, 0.08);
 }
 
 .model_img_box img,
@@ -247,10 +247,13 @@ nav .desk_login_btn:hover {
   height: inherit;
   z-index: -1;
   display: flex;
+  background: rgba(17, 24, 39, 0.16);
+  border-radius: 0.5rem;
 }
 
 .model_img_box img {
   object-fit: contain;
+  filter: saturate(1.05);
 }
 
 /* client logo */
