@@ -47709,7 +47709,7 @@
 
   //var shader = THREE.ShaderLib.phong
 
-  let scale = 50;
+  let scale = 60;
   function getOffSet(sliderX, sliderY, designWidthinInch, designHeightinInch) {
     let WrapX = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : parseFloat(WrapX);
     let WrapY = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : parseFloat(WrapY);
@@ -48292,7 +48292,7 @@
       add2DTexture(that, that.dpiCache.get(texture)['Img'], function (thats, text) {
         add2DTexture(that, shadow, function (thats, sha) {
           var tRepeat = getRepeat(false, oWidth, oHeight, that.twidth, that.theight, thats, isRepeatX, isRepeatY);
-          var offset = getOffSet(0, 0, that.twidth, that.theight, WrapX, WrapY, 50, thats);
+          var offset = getOffSet(0, 0, that.twidth, that.theight, WrapX, WrapY, 60, thats);
           var uniforms = {
             //texture: { type: 't', value: text },
             //texture1: { type: 't', value: text },
