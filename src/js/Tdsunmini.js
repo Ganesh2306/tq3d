@@ -47950,7 +47950,7 @@
     this.dracoPath = parameters.dracoPath !== undefined ? parameters.dracoPath : '../src/dependency/draco/';
     this.texture = parameters.texture !== undefined ? parameters.texture : _throwError('Texture not found.');
     this.defaultTexture = parameters.defaultTexture !== undefined ? parameters.defaultTexture : undefined;
-    this.isSkinColor = parameters.isSkinColor !== undefined ? new Color$2(parameters.isSkinColor).convertSRGBToLinear() : new Color$2('rgb(223,185,147)').convertSRGBToLinear();
+    this.isSkinColor = parameters.isSkinColor !== undefined ? new Color$2(parameters.isSkinColor).convertSRGBToLinear() : new Color$2('rgb(255, 100, 80)').convertSRGBToLinear();
     this.isShoesColor = parameters.isShoesColor !== undefined ? new Color$2(parameters.isShoesColor).convertSRGBToLinear() : new Color$2('rgb(0,0,0)').convertSRGBToLinear();
     this.isButton = parameters.isButton !== undefined && typeof parameters.isButton === 'boolean' ? parameters.isButton : false;
     // this.btnColor = parameters.btnColor !== undefined ? parameters.btnColor : _throwError('Button color not found.');
@@ -50534,7 +50534,7 @@
 
   function Webgl(parameters) {
     parameters = parameters || {};
-    this.isSkinColor = parameters.isSkinColor !== undefined ? parameters.isSkinColor : new Color$2('rgb(223,185,147)');
+    this.isSkinColor = parameters.isSkinColor !== undefined ? parameters.isSkinColor : new Color$2('rgb(255, 100, 80)');
     this.isShoesColor = parameters.isShoesColor !== undefined ? parameters.isShoesColor : new Color$2('rgb(0,0,0)');
     this.container = parameters.container ? document.getElementById(parameters.container) : document.body;
     this.dpiCache = parameters.dpiCache !== undefined ? parameters.dpiCache : _throwError('DpiCache not found');
@@ -57835,7 +57835,7 @@ let threeD = new threeDObject({
     this.dracoPath = parameters.dracoPath !== undefined ? parameters.dracoPath : '../src/dependency/draco/';
     this.designProductName = parameters.designProductName !== undefined ? parameters.designProductName : undefined;
     this.texture = parameters.texture !== undefined ? parameters.texture : defaultFabric;
-    this.isSkinColor = parameters.isSkinColor !== undefined ? parameters.isSkinColor : 'rgb(223,185,147)';
+    this.isSkinColor = parameters.isSkinColor !== undefined ? parameters.isSkinColor : 'rgb(255, 100, 80)';
     this.isShoesColor = parameters.isShoesColor !== undefined ? parameters.isShoesColor : 'rgb(0,0,0)';
     this.Dpi = parameters.Dpi !== undefined ? parseInt(parameters.Dpi) : false;
     this.twidth = parameters.twidth !== undefined ? parseFloat(parameters.twidth) : undefined;
