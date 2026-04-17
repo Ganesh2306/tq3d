@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_SERVER   = 'ubuntu@3.111.40.73'
+        APP_SERVER   = 'ubuntu@13.234.75.173'
         APP_DIR      = '/var/www/html/q3d'
         PLUGIN_Q3D_DIR = '/var/www/html/textronics/plugin/q3d/v4'   // Tds.min.js deploy path
         GITHUB_REPO    = 'https://github.com/Ganesh2306/tq3d.git'
